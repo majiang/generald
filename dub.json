@@ -1,0 +1,10 @@
+{
+	"name": "generald",
+	"description": "General online data processor library.",
+	"authors": ["Ryuichi OHORI"],
+	"copyright": "Unlicense",
+	"license": "Unlicense",
+	"dependencies":
+	{
+	}
+}
