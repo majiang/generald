@@ -161,6 +161,49 @@ z[0] = 5.tuple(2);
 </pre>
 <br><br>
 </dd>
+<dt><big><a name="functionTupleIdentity"></a>auto <u>functionTupleIdentity</u>(F)(F <i>f</i>);
+</big></dt>
+<dd>(a -&gt; b) -&gt; (a -&gt; (b, a))<br><br>
+
+</dd>
+<dt><big><a name="tupleTupleIdentity"></a>auto <u>tupleTupleIdentity</u>(B, F)(F <i>f</i>);
+</big></dt>
+<dd>(a -&gt; b) -&gt; ((a, c) -&gt; (b, c))<br><br>
+
+</dd>
+<dt><big><a name="eitherFunctionIdentity"></a>auto <u>eitherFunctionIdentity</u>(F)(F <i>f</i>);
+</big></dt>
+<dd>(a -&gt; b) -&gt; (a|b -&gt; b)<br><br>
+
+</dd>
+<dt><big><a name="eitherEitherIdentity"></a>auto <u>eitherEitherIdentity</u>(B, F)(F <i>f</i>);
+</big></dt>
+<dd>(a -&gt; b) -&gt; (a|c -&gt; b|c)<br><br>
+<b>Examples:</b><br>
+<pre class="d_code">
+<font color=green>// a = int, b = string, c = int[]
+</font><font color=blue>static</font> <font color=blue>class</font> TestedFunction : Function!(<font color=blue>int</font>, string)
+{
+	<font color=blue>override</font> string opCall(<font color=blue>int</font> x)
+	{
+		<font color=blue>import</font> std.math, std.conv;
+		<font color=blue>return</font> sqrt(<font color=blue>real</font>(1) + x * x).to!string;
+	}
+	<font color=blue>mixin</font> Singleton;
+}
+<font color=blue>auto</font> t = TestedFunction.get;
+<font color=blue>auto</font>
+	t0 = t.functionTupleIdentity,
+	t1 = t.tupleTupleIdentity!(<font color=blue>int</font>[]),
+	t2 = t.eitherFunctionIdentity,
+	t3 = t.<u>eitherEitherIdentity</u>!(<font color=blue>int</font>[]);
+<font color=blue>static</font> <font color=blue>assert</font> (<font color=blue>is</font> (<font color=blue>typeof</font> (t0) : Function!(<font color=blue>int</font>, Tuple!(string, <font color=blue>int</font>))));
+<font color=blue>static</font> <font color=blue>assert</font> (<font color=blue>is</font> (<font color=blue>typeof</font> (t1) : Function!(Tuple!(<font color=blue>int</font>, <font color=blue>int</font>[]), Tuple!(string, <font color=blue>int</font>[]))));
+<font color=blue>static</font> <font color=blue>assert</font> (<font color=blue>is</font> (<font color=blue>typeof</font> (t2) : Function!(Either!(<font color=blue>int</font>, string), string)));
+<font color=blue>static</font> <font color=blue>assert</font> (<font color=blue>is</font> (<font color=blue>typeof</font> (t3) : Function!(Either!(<font color=blue>int</font>, <font color=blue>int</font>[]), Either!(string, <font color=blue>int</font>[]))));
+</pre>
+<br><br>
+</dd>
 <dt><big><a name="Singleton"></a>template <u>Singleton</u>(Flag!"hideConstructor" hideConstructor = Yes.hideConstructor)</big></dt>
 <dd><u>Singleton</u> pattern.<br><br>
 

@@ -415,6 +415,55 @@ unittest
 		assert (p(x[i].tuple(y[i])).maybeEqual(z[i]));
 }
 
+/// (a -> b) -> (a -> (b, a))
+auto functionTupleIdentity(F)(F f)
+{
+	return f.functionTuple(IdentityFunction!(F.InputType).get);
+}
+
+/// (a -> b) -> ((a, c) -> (b, c))
+auto tupleTupleIdentity(B, F)(F f)
+{
+	return f.tupleTuple(IdentityFunction!B.get);
+}
+
+/// (a -> b) -> (a|b -> b)
+auto eitherFunctionIdentity(F)(F f)
+{
+	return f.eitherFunction(IdentityFunction!(F.OutputType).get);
+}
+
+/// (a -> b) -> (a|c -> b|c)
+auto eitherEitherIdentity(B, F)(F f)
+{
+	return f.eitherEither(IdentityFunction!B.get);
+}
+
+///
+unittest
+{
+	// a = int, b = string, c = int[]
+	static class TestedFunction : Function!(int, string)
+	{
+		override string opCall(int x)
+		{
+			import std.math, std.conv;
+			return sqrt(real(1) + x * x).to!string;
+		}
+		mixin Singleton;
+	}
+	auto t = TestedFunction.get;
+	auto
+		t0 = t.functionTupleIdentity,
+		t1 = t.tupleTupleIdentity!(int[]),
+		t2 = t.eitherFunctionIdentity,
+		t3 = t.eitherEitherIdentity!(int[]);
+	static assert (is (typeof (t0) : Function!(int, Tuple!(string, int))));
+	static assert (is (typeof (t1) : Function!(Tuple!(int, int[]), Tuple!(string, int[]))));
+	static assert (is (typeof (t2) : Function!(Either!(int, string), string)));
+	static assert (is (typeof (t3) : Function!(Either!(int, int[]), Either!(string, int[]))));
+}
+
 /// Singleton pattern.
 mixin template Singleton(Flag!"hideConstructor" hideConstructor = Yes.hideConstructor)
 {
