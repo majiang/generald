@@ -67,6 +67,7 @@ auto compose(F, G)(F f, G g)
 	return new ComposedFunction!(F.InputType, F.OutputType, G.InputType, G.OutputType)(f, g);
 }
 
+///
 unittest
 {
 	auto f = RealFunction!(triple!int).get.compose(RealFunction!(increment!int).get);
@@ -399,6 +400,7 @@ auto swapResult(F)(F f)
 	return f.compose(swapper!(F.OutputType.Types[0], F.OutputType.Types[1])());
 }
 
+///
 unittest
 {
 	auto x = new Maybe!int[4];
