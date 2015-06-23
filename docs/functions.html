@@ -124,6 +124,21 @@ This module implements a variety of classes derived from Function.<br><br>
 <dd>Function from and to Tuple.<br><br>
 
 </dd>
+<dt><big><a name="MaybeTuple"></a>class <u>MaybeTuple</u>(A, B): Function!(Tuple!(Maybe!A, Maybe!B), Maybe!(Tuple!(A, B)));
+</big></dt>
+<dd>Function from Tuple of Maybe to Maybe of Tuple.<br><br>
+
+</dd>
+<dt><big><a name="swapper"></a>auto <u>swapper</u>(A, B)();
+</big></dt>
+<dd>Returns the function which swaps the components of the given tuple.<br><br>
+
+</dd>
+<dt><big><a name="swapResult"></a>auto <u>swapResult</u>(F)(F <i>f</i>);
+</big></dt>
+<dd>Compose with swapper.<br><br>
+
+</dd>
 <dt><big><a name="Singleton"></a>template <u>Singleton</u>(Flag!"hideConstructor" hideConstructor = Yes.hideConstructor)</big></dt>
 <dd><u>Singleton</u> pattern.<br><br>
 

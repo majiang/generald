@@ -375,6 +375,44 @@ auto tupleTuple(F, G)(F f, G g)
 		TupleRight!(F.InputType, G.InputType).get.compose(g));
 }
 
+/// Function from Tuple of Maybe to Maybe of Tuple.
+class MaybeTuple(A, B) : Function!(Tuple!(Maybe!A, Maybe!B), Maybe!(Tuple!(A, B)))
+{
+	override Maybe!(Tuple!(A, B)) opCall(Tuple!(Maybe!A, Maybe!B) x)
+	{
+		if (x[0].isNull || x[1].isNull)
+			return Maybe!(Tuple!(A, B))();
+		return Maybe!(Tuple!(A, B))(x[0].get.tuple(x[1].get));
+	}
+	mixin Singleton;
+}
+
+/// Returns the function which swaps the components of the given tuple.
+auto swapper(A, B)()
+{
+	return TupleRight!(A, B).get.functionTuple(TupleLeft!(A, B).get);
+}
+
+/// Compose with swapper.
+auto swapResult(F)(F f)
+{
+	return f.compose(swapper!(F.OutputType.Types[0], F.OutputType.Types[1])());
+}
+
+unittest
+{
+	auto x = new Maybe!int[4];
+	auto y = new Maybe!int[4];
+	auto z = new Maybe!(Tuple!(int, int))[4];
+	x[0] = 2; x[1] = 3;
+	y[0] = 5, y[2] = 7;
+	z[0] = 5.tuple(2);
+	auto p = IdentityFunction!(Tuple!(Maybe!int, Maybe!int)).get
+	.swapResult.compose(MaybeTuple!(int, int).get);
+	foreach (i; 0..4)
+		assert (p(x[i].tuple(y[i])).maybeEqual(z[i]));
+}
+
 /// Singleton pattern.
 mixin template Singleton(Flag!"hideConstructor" hideConstructor = Yes.hideConstructor)
 {
@@ -388,6 +426,30 @@ mixin template Singleton(Flag!"hideConstructor" hideConstructor = Yes.hideConstr
 	static if (hideConstructor)
 	private this ()
 	{
+	}
+}
+
+debug
+{
+	class Printer(T) : Function!(T, void)
+	{
+		override void opCall(T x)
+		{
+			import std.stdio;
+			writeln(x);
+		}
+		mixin Singleton;
+	}
+	auto autoPrint(F)(F f)
+	{
+		return f.compose(Printer!(F.OutputType).get);
+	}
+	auto autoPrintJustOnly(F)(F f)
+	{
+		static if (is (F.OutputType : Maybe!B, B))
+			return f.compose(Printer!B.get.maybeSink);
+		else
+			static assert (false);
 	}
 }
 
