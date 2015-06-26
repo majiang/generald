@@ -145,7 +145,7 @@ This module implements a variety of classes derived from Function.<br><br>
 <dt><big><a name="EitherFunction"></a>class <u>EitherFunction</u>(A, B, C): Function!(Either!(A, B), C);
 <br><a name="eitherFunction"></a>auto <u>eitherFunction</u>(F, G)(F <i>f</i>, G <i>g</i>) if (is(F.OutputType == G.OutputType));
 </big></dt>
-<dd>Function from either.<br><br>
+<dd>Tuple of functions, which takes an Either.<br><br>
 
 </dd>
 <dt><big><a name="LeftEither"></a>template <u>LeftEither</u>(A, B)<br><a name="RightEither"></a>template <u>RightEither</u>(A, B)</big></dt>
@@ -170,7 +170,7 @@ This module implements a variety of classes derived from Function.<br><br>
 <dt><big><a name="FunctionTuple"></a>class <u>FunctionTuple</u>(A, B, C): Function!(A, Tuple!(B, C));
 <br><a name="functionTuple"></a>auto <u>functionTuple</u>(F, G)(F <i>f</i>, G <i>g</i>) if (is(F.InputType == G.InputType));
 </big></dt>
-<dd>Function to Tuple.<br><br>
+<dd>Tuple of functions, which returns a Tuple.<br><br>
 
 </dd>
 <dt><big><a name="TupleLeft"></a>class <u>TupleLeft</u>(A, B): Function!(Tuple!(A, B), A);
@@ -252,6 +252,52 @@ z[0] = 5.tuple(2);
 <font color=blue>static</font> <font color=blue>assert</font> (<font color=blue>is</font> (<font color=blue>typeof</font> (t1) : Function!(Tuple!(<font color=blue>int</font>, <font color=blue>int</font>[]), Tuple!(string, <font color=blue>int</font>[]))));
 <font color=blue>static</font> <font color=blue>assert</font> (<font color=blue>is</font> (<font color=blue>typeof</font> (t2) : Function!(Either!(<font color=blue>int</font>, string), string)));
 <font color=blue>static</font> <font color=blue>assert</font> (<font color=blue>is</font> (<font color=blue>typeof</font> (t3) : Function!(Either!(<font color=blue>int</font>, <font color=blue>int</font>[]), Either!(string, <font color=blue>int</font>[]))));
+</pre>
+<br><br>
+</dd>
+<dt><big><a name="FunctionEither"></a>class <u>FunctionEither</u>(A, B, C): Function!(A, Either!(B, C));
+<br><a name="functionEitherLeft"></a>auto <u>functionEitherLeft</u>(C, F)(F <i>f</i>);
+<br><a name="functionEitherRight"></a>auto <u>functionEitherRight</u>(B, F)(F <i>f</i>);
+</big></dt>
+<dd>Either of functions, which returns an Either.<br><br>
+<b>Examples:</b><br>
+<pre class="d_code">
+<font color=blue>static</font> <font color=blue>real</font> lreal(<font color=blue>int</font> x)
+{
+	<font color=blue>import</font> std.math;
+	<font color=blue>return</font> PI * x;
+}
+<font color=blue>static</font> string rstring(<font color=blue>int</font> x)
+{
+	<font color=blue>import</font> std.conv;
+	<font color=blue>return</font> x.to!string;
+}
+<font color=blue>auto</font> fl = RealFunction!lreal.get.functionEitherLeft!string;
+<font color=blue>auto</font> fr = RealFunction!rstring.get.<u>functionEitherRight</u>!<font color=blue>real</font>;
+<font color=blue>static</font> <font color=blue>assert</font> (<font color=blue>is</font> (<font color=blue>typeof</font> (fl) == <font color=blue>typeof</font> (fr)));
+</pre>
+<br><br>
+</dd>
+<dt><big><a name="TupleFunction"></a>class <u>TupleFunction</u>(A, B, C): Function!(Tuple!(A, B), C);
+<br><a name="leftTupleFunction"></a>auto <u>leftTupleFunction</u>(B, F)(F <i>f</i>);
+<br><a name="rightTupleFunction"></a>auto <u>rightTupleFunction</u>(A, F)(F <i>f</i>);
+</big></dt>
+<dd>Either of functions, which takes a Tuple.<br><br>
+<b>Examples:</b><br>
+<pre class="d_code">
+<font color=blue>static</font> string cts(<font color=blue>char</font> x)
+{
+	<font color=blue>import</font> std.conv : to;
+	<font color=blue>return</font> x.to!string;
+}
+<font color=blue>static</font> string rts(<font color=blue>real</font> x)
+{
+	<font color=blue>import</font> std.conv : to;
+	<font color=blue>return</font> x.to!string;
+}
+<font color=blue>auto</font> l = RealFunction!cts.get.leftTupleFunction!<font color=blue>real</font>;
+<font color=blue>auto</font> r = RealFunction!rts.get.<u>rightTupleFunction</u>!<font color=blue>char</font>;
+<font color=blue>static</font> <font color=blue>assert</font> (<font color=blue>is</font> (<font color=blue>typeof</font> (l) == <font color=blue>typeof</font> (r)));
 </pre>
 <br><br>
 </dd>

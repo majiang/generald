@@ -554,6 +554,120 @@ unittest
 	static assert (is (typeof (t3) : Function!(Either!(int, int[]), Either!(string, int[]))));
 }
 
+/// Either of functions, which returns an Either.
+class FunctionEither(A, B, C) : Function!(A, Either!(B, C))
+{
+	Either!(Function!(A, B), Function!(A, C)) f;
+	this (Either!(Function!(A, B), Function!(A, C)) f)
+	{
+		this.f = f;
+	}
+	this (Function!(A, B) f)
+	{
+		this.f = f;
+	}
+	this (Function!(A, C) f)
+	{
+		this.f = f;
+	}
+	override Either!(B, C) opCall(A x)
+	{
+		if (!f.which)
+			return f.a()(x).left!C;
+		else
+			return f.b()(x).right!B;
+	}
+}
+
+/// ditto
+auto functionEitherLeft(C, F)(F f)
+{
+	static if (is (F : Function!(A, B), A, B))
+		return new FunctionEither!(A, B, C)(f);
+	else static assert (false);
+}
+
+/// ditto
+auto functionEitherRight(B, F)(F f)
+{
+	static if (is (F : Function!(A, C), A, C))
+		return new FunctionEither!(A, B, C)(f);
+	else static assert (false);
+}
+
+///
+unittest
+{
+	static real lreal(int x)
+	{
+		import std.math;
+		return PI * x;
+	}
+	static string rstring(int x)
+	{
+		import std.conv;
+		return x.to!string;
+	}
+	auto fl = RealFunction!lreal.get.functionEitherLeft!string;
+	auto fr = RealFunction!rstring.get.functionEitherRight!real;
+	static assert (is (typeof (fl) == typeof (fr)));
+}
+
+/// Either of functions, which takes a Tuple.
+class TupleFunction(A, B, C) : Function!(Tuple!(A, B), C)
+{
+	Either!(Function!(A, C), Function!(B, C)) f;
+	this (Either!(Function!(A, C), Function!(B, C)) f)
+	{
+		this.f = f;
+	}
+	this (Function!(A, C) f)
+	{
+		this.f = f;
+	}
+	this (Function!(B, C) f)
+	{
+		this.f = f;
+	}
+	override C opCall(Tuple!(A, B) x)
+	{
+		if (!f.which)
+			return f.a()(x[0]);
+		else
+			return f.b()(x[1]);
+	}
+}
+
+/// ditto
+auto leftTupleFunction(B, F)(F f)
+{
+	return new TupleFunction!(F.InputType, B, F.OutputType)(f);
+}
+
+/// ditto
+auto rightTupleFunction(A, F)(F f)
+{
+	return new TupleFunction!(A, F.InputType, F.OutputType)(f);
+}
+
+///
+unittest
+{
+	static string cts(char x)
+	{
+		import std.conv : to;
+		return x.to!string;
+	}
+	static string rts(real x)
+	{
+		import std.conv : to;
+		return x.to!string;
+	}
+	auto l = RealFunction!cts.get.leftTupleFunction!real;
+	auto r = RealFunction!rts.get.rightTupleFunction!char;
+	static assert (is (typeof (l) == typeof (r)));
+}
+
 /// Singleton pattern.
 mixin template Singleton(Flag!"hideConstructor" hideConstructor = Yes.hideConstructor)
 {
