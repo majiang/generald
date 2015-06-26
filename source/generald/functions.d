@@ -182,7 +182,7 @@ class MaybeReturn(A) : Function!(A, Maybe!A)
 {
 	override Maybe!A opCall(A x)
 	{
-		return Maybe!A(x);
+		return just(x);
 	}
 	mixin Singleton;
 }
@@ -198,7 +198,7 @@ class MaybeBind(A, B) : Function!(Maybe!A, Maybe!B)
 	override Maybe!B opCall(Maybe!A x)
 	{
 		if (x.isNull)
-			return Maybe!B();
+			return nothing!B;
 		return f(x.get);
 	}
 }
@@ -222,7 +222,7 @@ auto maybeMap(F)(F f)
 unittest
 {
 	auto maybeId = maybeMap(RealFunction!(id!int).get);
-	assert (maybeId(Maybe!int(0)) == Maybe!int(0));
+	assert (maybeId(just(0)) == just(0));
 }
 
 /// Compose two Functions f and g where f emits a Maybe!B and g takes a B.
@@ -275,7 +275,7 @@ class MaybeNothing(A, B, C=void) : Function!(A, Maybe!B)
 	override Maybe!B opCall(A x)
 	{
 		sink(x);
-		return Maybe!B();
+		return nothing!B;
 	}
 }
 
@@ -284,6 +284,16 @@ auto maybeNothing(B, F)(F f)
 {
 	return new MaybeNothing!(F.InputType, B, F.OutputType)(f);
 }
+
+Maybe!A nothing(A)()
+{
+	return Maybe!A();
+}
+Maybe!A just(A)(A x)
+{
+	return Maybe!A(x);
+}
+
 
 /// Either type.
 struct Either(A, B)
@@ -481,8 +491,8 @@ class MaybeTuple(A, B) : Function!(Tuple!(Maybe!A, Maybe!B), Maybe!(Tuple!(A, B)
 	override Maybe!(Tuple!(A, B)) opCall(Tuple!(Maybe!A, Maybe!B) x)
 	{
 		if (x[0].isNull || x[1].isNull)
-			return Maybe!(Tuple!(A, B))();
-		return Maybe!(Tuple!(A, B))(x[0].get.tuple(x[1].get));
+			return nothing!(Tuple!(A, B));
+		return just(x[0].get.tuple(x[1].get));
 	}
 	mixin Singleton;
 }
@@ -620,10 +630,10 @@ version (unittest)
 	Maybe!T collatz(T)(T x)
 	{
 		if (x <= 1)
-			return Maybe!T();
+			return nothing!T;
 		if (x & 1)
-			return Maybe!T(x.triple.increment);
-		return Maybe!T(x / 2);
+			return just(x.triple.increment);
+		return just(x / 2);
 	}
 	bool maybeEqual(T)(Maybe!T x, Maybe!T y)
 	{

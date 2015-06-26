@@ -108,7 +108,7 @@ This module implements a variety of classes derived from Function.<br><br>
 <b>Examples:</b><br>
 <pre class="d_code">
 <font color=blue>auto</font> maybeId = <u>maybeMap</u>(RealFunction!(id!<font color=blue>int</font>).get);
-<font color=blue>assert</font> (maybeId(Maybe!<font color=blue>int</font>(0)) == Maybe!<font color=blue>int</font>(0));
+<font color=blue>assert</font> (maybeId(just(0)) == just(0));
 </pre>
 <br><br>
 </dd>
