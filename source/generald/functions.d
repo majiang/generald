@@ -328,10 +328,10 @@ struct Either(A, B)
 	string toString()
 	{
 		import std.conv;
-		if (which)
-			return _b.to!string;
-		else
+		if (!which)
 			return _a.to!string;
+		else
+			return _b.to!string;
 	}
 private:
 	bool nonNull, which;
@@ -359,7 +359,7 @@ private:
 	}
 }
 
-/// Function from either.
+/// Tuple of functions, which takes an Either.
 class EitherFunction(A, B, C) : Function!(Either!(A, B), C)
 {
 	Function!(A, C) f;
@@ -373,9 +373,8 @@ class EitherFunction(A, B, C) : Function!(Either!(A, B), C)
 	{
 		if (!x.which)
 			return f(x.a);
-		if ( x.which)
+		else
 			return g(x.b);
-		assert (false);
 	}
 }
 
@@ -388,27 +387,9 @@ auto eitherFunction(F, G)(F f, G g)
 
 /// Function to Either.
 alias LeftEither(A, B) = RealFunction!(left!(B, A));
-version (none)
-class LeftEither(A, B) : Function!(A, Either!(A, B))
-{
-	override OutputType opCall(InputType x)
-	{
-		return OutputType(x);
-	}
-	mixin Singleton;
-}
 
 /// ditto
 alias RightEither(A, B) = RealFunction!(right!(A, B));
-version (none)
-class RightEither(A, B) : Function!(B, Either!(A, B))
-{
-	override OutputType opCall(InputType x)
-	{
-		return OutputType(x);
-	}
-	mixin Singleton;
-}
 
 /// Either!(, B) functor at A.
 Either!(A, B) left(B, A)(A a)
@@ -434,7 +415,7 @@ auto eitherEither(F, G)(F f, G g)
 		g.compose(RightEither!(F.OutputType, G.OutputType).get));
 }
 
-/// Function to Tuple.
+/// Tuple of functions, which returns a Tuple.
 class FunctionTuple(A, B, C) : Function!(A, Tuple!(B, C))
 {
 	Function!(A, B) f;
@@ -608,8 +589,7 @@ debug
 	{
 		static if (is (F.OutputType : Maybe!B, B))
 			return f.compose(Printer!B.get.maybeSink);
-		else
-			static assert (false);
+		else static assert (false);
 	}
 }
 
