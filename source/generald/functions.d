@@ -78,6 +78,105 @@ unittest
 	assert (g(1) == 6);
 }
 
+/// Curry a function.
+class CurriedFunction(A, B, C) : Function!(A, Function!(B, C))
+{
+	Function!(Tuple!(A, B), C) uncurried;
+	this (Function!(Tuple!(A, B), C) uncurried)
+	{
+		this.uncurried = uncurried;
+	}
+	class Partial : Function!(B, C)
+	{
+		A x;
+		this (A x)
+		{
+			this.x = x;
+		}
+		override C opCall(B x)
+		{
+			return uncurried(this.x.tuple(x));
+		}
+	}
+	override Function!(B, C) opCall(A x)
+	{
+		return new Partial(x);
+	}
+}
+
+/// ditto
+auto curry(F)(F f)
+{
+	static if (is (F.InputType : Tuple!(A, B), A, B))
+		return new CurriedFunction!(A, B, F.OutputType)(f);
+	else static assert (false);
+}
+
+///
+unittest
+{
+	static class F : Function!(Tuple!(int, int), int)
+	{
+		override int opCall(Tuple!(int, int) x)
+		{
+			return x[0] + x[1];
+		}
+		mixin Singleton;
+	}
+	auto cf = F.get.curry;
+	static assert (is (typeof (cf) : Function!(int, Function!(int, int))));
+}
+
+/// Uncurry a function.
+class UncurriedFunction(A, B, C) : Function!(Tuple!(A, B), C)
+{
+	Function!(A, Function!(B, C)) curried;
+	this (Function!(A, Function!(B, C)) curried)
+	{
+		this.curried = curried;
+	}
+	override C opCall(Tuple!(A, B) x)
+	{
+		return curried(x[0])(x[1]);
+	}
+}
+
+/// ditto
+auto uncurry(F)(F f)
+{
+	static if (is (F.OutputType == Function!(B, C), B, C))
+		return new UncurriedFunction!(F.InputType, B, C)(f);
+	else static assert (false);
+}
+
+///
+unittest
+{
+	static class G : Function!(int, Function!(int, int))
+	{
+
+		class g : Function!(int, int)
+		{
+			int x;
+			this (int x)
+			{
+				this.x = x;
+			}
+			override int opCall(int x)
+			{
+				return this.x + x;
+			}
+		}
+		override Function!(int, int) opCall(int x)
+		{
+			return new g(x);
+		}
+		mixin Singleton;
+	}
+	auto ug = G.get.uncurry;
+	static assert (is (typeof (ug) : Function!(Tuple!(int, int), int)));
+}
+
 /// Return function for Maybe.
 class MaybeReturn(A) : Function!(A, Maybe!A)
 {

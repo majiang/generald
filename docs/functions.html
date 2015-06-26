@@ -40,6 +40,57 @@ This module implements a variety of classes derived from Function.<br><br>
 </pre>
 <br><br>
 </dd>
+<dt><big><a name="CurriedFunction"></a>class <u>CurriedFunction</u>(A, B, C): Function!(A, Function!(B, C));
+<br><a name="curry"></a>auto <u>curry</u>(F)(F <i>f</i>);
+</big></dt>
+<dd>Curry a function.<br><br>
+<b>Examples:</b><br>
+<pre class="d_code">
+<font color=blue>static</font> <font color=blue>class</font> F : Function!(Tuple!(<font color=blue>int</font>, <font color=blue>int</font>), <font color=blue>int</font>)
+{
+	<font color=blue>override</font> <font color=blue>int</font> opCall(Tuple!(<font color=blue>int</font>, <font color=blue>int</font>) x)
+	{
+		<font color=blue>return</font> x[0] + x[1];
+	}
+	<font color=blue>mixin</font> Singleton;
+}
+<font color=blue>auto</font> cf = F.get.<u>curry</u>;
+<font color=blue>static</font> <font color=blue>assert</font> (<font color=blue>is</font> (<font color=blue>typeof</font> (cf) : Function!(<font color=blue>int</font>, Function!(<font color=blue>int</font>, <font color=blue>int</font>))));
+</pre>
+<br><br>
+</dd>
+<dt><big><a name="UncurriedFunction"></a>class <u>UncurriedFunction</u>(A, B, C): Function!(Tuple!(A, B), C);
+<br><a name="uncurry"></a>auto <u>uncurry</u>(F)(F <i>f</i>);
+</big></dt>
+<dd>Uncurry a function.<br><br>
+<b>Examples:</b><br>
+<pre class="d_code">
+<font color=blue>static</font> <font color=blue>class</font> G : Function!(<font color=blue>int</font>, Function!(<font color=blue>int</font>, <font color=blue>int</font>))
+{
+
+	<font color=blue>class</font> g : Function!(<font color=blue>int</font>, <font color=blue>int</font>)
+	{
+		<font color=blue>int</font> x;
+		<font color=blue>this</font> (<font color=blue>int</font> x)
+		{
+			<font color=blue>this</font>.x = x;
+		}
+		<font color=blue>override</font> <font color=blue>int</font> opCall(<font color=blue>int</font> x)
+		{
+			<font color=blue>return</font> <font color=blue>this</font>.x + x;
+		}
+	}
+	<font color=blue>override</font> Function!(<font color=blue>int</font>, <font color=blue>int</font>) opCall(<font color=blue>int</font> x)
+	{
+		<font color=blue>return</font> <font color=blue>new</font> g(x);
+	}
+	<font color=blue>mixin</font> Singleton;
+}
+<font color=blue>auto</font> ug = G.get.<u>uncurry</u>;
+<font color=blue>static</font> <font color=blue>assert</font> (<font color=blue>is</font> (<font color=blue>typeof</font> (ug) : Function!(Tuple!(<font color=blue>int</font>, <font color=blue>int</font>), <font color=blue>int</font>)));
+</pre>
+<br><br>
+</dd>
 <dt><big><a name="MaybeReturn"></a>class <u>MaybeReturn</u>(A): Function!(A, Maybe!A);
 </big></dt>
 <dd>Return function for Maybe.<br><br>
