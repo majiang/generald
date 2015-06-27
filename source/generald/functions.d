@@ -24,20 +24,19 @@ class RealFunction(alias f, A=ParameterTypeTuple!f[0], B=ReturnType!f) : Functio
 	mixin Singleton;
 }
 
-///
-class IdentityFunction(T) : Function!(T, T)
+/// Identity function.
+T id(T)(T x)
 {
-	override T opCall(T x)
-	{
-		return x;
-	}
-	mixin Singleton;
+	return x;
 }
+
+/// ditto
+alias IdentityFunction(T) = RealFunction!(id!T);
 
 ///
 unittest
 {
-	auto f = RealFunction!(id!int).get;
+	auto f = IdentityFunction!int.get;
 	assert (f(0) == 0);
 }
 
@@ -178,14 +177,7 @@ unittest
 }
 
 /// Return function for Maybe.
-class MaybeReturn(A) : Function!(A, Maybe!A)
-{
-	override Maybe!A opCall(A x)
-	{
-		return just(x);
-	}
-	mixin Singleton;
-}
+alias MaybeReturn(A) = RealFunction!(just!A);
 
 /// Bind function for Maybe: (a -> Maybe b) -> (Maybe a -> Maybe b).
 class MaybeBind(A, B) : Function!(Maybe!A, Maybe!B)
@@ -211,7 +203,7 @@ auto maybeBind(F)(F f)
 	else static assert (false);
 }
 
-/// fmap function for Maybe.
+/// Map function for Maybe.
 auto maybeMap(F)(F f)
 	if (is (F : Function!(A, B), A, B))
 {
@@ -439,24 +431,22 @@ auto functionTuple(F, G)(F f, G g)
 }
 
 /// Function from Tuple.
-class TupleLeft(A, B) : Function!(Tuple!(A, B), A)
+auto tupleLeft(T)(T x)
 {
-	override A opCall(Tuple!(A, B) x)
-	{
-		return x[0];
-	}
-	mixin Singleton;
+	return x[0];
 }
 
 /// ditto
-class TupleRight(A, B) : Function!(Tuple!(A, B), B)
+auto tupleRight(T)(T x)
 {
-	override B opCall(Tuple!(A, B) x)
-	{
-		return x[1];
-	}
-	mixin Singleton;
+	return x[1];
 }
+
+/// ditto
+alias TupleLeft(A, B) = RealFunction!(tupleLeft!(Tuple!(A, B)));
+
+/// ditto
+alias TupleRight(A, B) = RealFunction!(tupleRight!(Tuple!(A, B)));
 
 /// Function from and to Tuple.
 auto tupleTuple(F, G)(F f, G g)
@@ -467,16 +457,15 @@ auto tupleTuple(F, G)(F f, G g)
 }
 
 /// Function from Tuple of Maybe to Maybe of Tuple.
-class MaybeTuple(A, B) : Function!(Tuple!(Maybe!A, Maybe!B), Maybe!(Tuple!(A, B)))
+auto maybeTuple(TM)(TM x)
 {
-	override Maybe!(Tuple!(A, B)) opCall(Tuple!(Maybe!A, Maybe!B) x)
-	{
-		if (x[0].isNull || x[1].isNull)
-			return nothing!(Tuple!(A, B));
-		return just(x[0].get.tuple(x[1].get));
-	}
-	mixin Singleton;
+	if (x[0].isNull || x[1].isNull)
+		return nothing!(Tuple!(typeof (x[0].get), typeof (x[1].get)));
+	return just(x[0].get.tuple(x[1].get));
 }
+
+/// ditto
+alias MaybeTuple(A, B) = RealFunction!(maybeTuple!(Tuple!(Maybe!A, Maybe!B)));
 
 /// Returns the function which swaps the components of the given tuple.
 auto swapper(A, B)()
@@ -532,7 +521,6 @@ auto eitherEitherIdentity(B, F)(F f)
 ///
 unittest
 {
-	// a = int, b = string, c = int[]
 	static class TestedFunction : Function!(int, string)
 	{
 		override string opCall(int x)
@@ -709,10 +697,6 @@ debug
 
 version (unittest)
 {
-	T id(T)(T x)
-	{
-		return x;
-	}
 	T triple(T)(T x)
 	{
 		return x * 3;
