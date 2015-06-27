@@ -16,11 +16,12 @@ This module implements a variety of classes derived from Function.<br><br>
 <dd>Template for converting a function to Function instance.<br><br>
 
 </dd>
-<dt><big><a name="IdentityFunction"></a>class <u>IdentityFunction</u>(T): Function!(T, T);
-</big></dt>
-<dd><b>Examples:</b><br>
+<dt><big><a name="id"></a>T <u>id</u>(T)(T <i>x</i>);
+<br><a name="IdentityFunction"></a>template <u>IdentityFunction</u>(T)</big></dt>
+<dd>Identity function.<br><br>
+<b>Examples:</b><br>
 <pre class="d_code">
-<font color=blue>auto</font> f = RealFunction!(id!<font color=blue>int</font>).get;
+<font color=blue>auto</font> f = <u>IdentityFunction</u>!<font color=blue>int</font>.get;
 <font color=blue>assert</font> (f(0) == 0);
 </pre>
 <br><br>
@@ -91,8 +92,7 @@ This module implements a variety of classes derived from Function.<br><br>
 </pre>
 <br><br>
 </dd>
-<dt><big><a name="MaybeReturn"></a>class <u>MaybeReturn</u>(A): Function!(A, Maybe!A);
-</big></dt>
+<dt><big><a name="MaybeReturn"></a>template <u>MaybeReturn</u>(A)</big></dt>
 <dd>Return function for Maybe.<br><br>
 
 </dd>
@@ -104,7 +104,7 @@ This module implements a variety of classes derived from Function.<br><br>
 </dd>
 <dt><big><a name="maybeMap"></a>auto <u>maybeMap</u>(F)(F <i>f</i>) if (is(F : Function!(A, B), A, B));
 </big></dt>
-<dd>fmap function for Maybe.<br><br>
+<dd>Map function for Maybe.<br><br>
 <b>Examples:</b><br>
 <pre class="d_code">
 <font color=blue>auto</font> maybeId = <u>maybeMap</u>(RealFunction!(id!<font color=blue>int</font>).get);
@@ -173,9 +173,9 @@ This module implements a variety of classes derived from Function.<br><br>
 <dd>Tuple of functions, which returns a Tuple.<br><br>
 
 </dd>
-<dt><big><a name="TupleLeft"></a>class <u>TupleLeft</u>(A, B): Function!(Tuple!(A, B), A);
-<br><a name="TupleRight"></a>class <u>TupleRight</u>(A, B): Function!(Tuple!(A, B), B);
-</big></dt>
+<dt><big><a name="tupleLeft"></a>auto <u>tupleLeft</u>(T)(T <i>x</i>);
+<br><a name="tupleRight"></a>auto <u>tupleRight</u>(T)(T <i>x</i>);
+<br><a name="TupleLeft"></a>template <u>TupleLeft</u>(A, B)<br><a name="TupleRight"></a>template <u>TupleRight</u>(A, B)</big></dt>
 <dd>Function from Tuple.<br><br>
 
 </dd>
@@ -184,8 +184,8 @@ This module implements a variety of classes derived from Function.<br><br>
 <dd>Function from and to Tuple.<br><br>
 
 </dd>
-<dt><big><a name="MaybeTuple"></a>class <u>MaybeTuple</u>(A, B): Function!(Tuple!(Maybe!A, Maybe!B), Maybe!(Tuple!(A, B)));
-</big></dt>
+<dt><big><a name="maybeTuple"></a>auto <u>maybeTuple</u>(TM)(TM <i>x</i>);
+<br><a name="MaybeTuple"></a>template <u>MaybeTuple</u>(A, B)</big></dt>
 <dd>Function from Tuple of Maybe to Maybe of Tuple.<br><br>
 
 </dd>
@@ -232,8 +232,7 @@ z[0] = 5.tuple(2);
 <dd>(a -&gt; b) -&gt; (a|c -&gt; b|c)<br><br>
 <b>Examples:</b><br>
 <pre class="d_code">
-<font color=green>// a = int, b = string, c = int[]
-</font><font color=blue>static</font> <font color=blue>class</font> TestedFunction : Function!(<font color=blue>int</font>, string)
+<font color=blue>static</font> <font color=blue>class</font> TestedFunction : Function!(<font color=blue>int</font>, string)
 {
 	<font color=blue>override</font> string opCall(<font color=blue>int</font> x)
 	{
@@ -300,6 +299,29 @@ z[0] = 5.tuple(2);
 <font color=blue>static</font> <font color=blue>assert</font> (<font color=blue>is</font> (<font color=blue>typeof</font> (l) == <font color=blue>typeof</font> (r)));
 </pre>
 <br><br>
+</dd>
+<dt><big><a name="FunctionArray"></a>class <u>FunctionArray</u>(A, B): Function!(A, B[]);
+<br><a name="functionArray"></a>auto <u>functionArray</u>(F)(F[] <i>fs</i>);
+</big></dt>
+<dd>Takues an array of functions and return a function to array.<br><br>
+
+</dd>
+<dt><big><a name="ArrayMap"></a>class <u>ArrayMap</u>(A, B): Function!(A[], B[]);
+<br><a name="arrayMap"></a>auto <u>arrayMap</u>(F)(F <i>f</i>);
+</big></dt>
+<dd>Map function for Array.<br><br>
+
+</dd>
+<dt><big><a name="ArrayBind"></a>class <u>ArrayBind</u>(A, B): Function!(A[], B[]);
+<br><a name="arrayBind"></a>auto <u>arrayBind</u>(F)(F <i>f</i>);
+</big></dt>
+<dd>Bind function for Array.<br><br>
+
+</dd>
+<dt><big><a name="arrayOnly"></a>auto <u>arrayOnly</u>(A)(A <i>x</i>);
+<br><a name="ArrayReturn"></a>template <u>ArrayReturn</u>(A)</big></dt>
+<dd>Return function for Array.<br><br>
+
 </dd>
 <dt><big><a name="Singleton"></a>template <u>Singleton</u>(Flag!"hideConstructor" hideConstructor = Yes.hideConstructor)</big></dt>
 <dd><u>Singleton</u> pattern.<br><br>

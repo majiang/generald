@@ -656,6 +656,82 @@ unittest
 	static assert (is (typeof (l) == typeof (r)));
 }
 
+/// Takues an array of functions and return a function to array.
+class FunctionArray(A, B) : Function!(A, B[])
+{
+	Function!(A, B)[] fs;
+	this (Function!(A, B)[] fs)
+	{
+		this.fs = fs;
+	}
+	override B[] opCall(A x)
+	{
+		B[] ret;
+		foreach (f; fs)
+			ret ~= f(x);
+	}
+}
+
+/// ditto
+auto functionArray(F)(F[] fs)
+{
+	return new FunctionArray!(F.InputType, F.OutputType)(fs);
+}
+
+/// Map function for Array.
+class ArrayMap(A, B) : Function!(A[], B[])
+{
+	Function!(A, B) f;
+	this (Function!(A, B) f)
+	{
+		this.f = f;
+	}
+	override B[] opCall(A[] xs)
+	{
+		B[] ret;
+		foreach (x; xs)
+			ret ~= f(x);
+		return ret;
+	}
+}
+
+/// ditto
+auto arrayMap(F)(F f)
+{
+	return new ArrayMap!(F.InputType, F.OutputType)(f);
+}
+
+/// Bind function for Array.
+class ArrayBind(A, B) : Function!(A[], B[])
+{
+	Function!(A, B[]) f;
+	this (Function!(A, B[]) f)
+	{
+		this.f = f;
+	}
+	override B[] opCall(A[] xs)
+	{
+		B[] ret;
+		foreach (x; xs)
+			ret ~= f(x);
+		return ret;
+	}
+}
+
+/// ditto
+auto arrayBind(F)(F f)
+{
+	return new ArrayBind!(F.InputType, ElementType!(F.OutputType));
+}
+
+/// Return function for Array.
+auto arrayOnly(A)(A x)
+{
+	return [x];
+}
+/// ditto
+alias ArrayReturn(A) = RealFunction!(arrayOnly!A);
+
 /// Singleton pattern.
 mixin template Singleton(Flag!"hideConstructor" hideConstructor = Yes.hideConstructor)
 {
