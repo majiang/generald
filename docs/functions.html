@@ -351,6 +351,33 @@ RealFunction!(writeln!<font color=blue>int</font>).get.<u>arraySink</u>()(10.iot
 </pre>
 <br><br>
 </dd>
+<dt><big><a name="ArrayArray"></a>class <u>ArrayArray</u>(A, B): Function!(A[], B[]);
+<br><a name="arrayArray"></a>auto <u>arrayArray</u>(FS)(FS <i>fs</i>);
+</big></dt>
+<dd>Take an array of functions and return a function from and to array.<br><br>
+<b>Examples:</b><br>
+<pre class="d_code">
+<font color=blue>static</font> <font color=blue>class</font> Adder : Function!(<font color=blue>int</font>, <font color=blue>int</font>)
+{
+	<font color=blue>int</font> added;
+	<font color=blue>this</font> (<font color=blue>int</font> added)
+	{
+		<font color=blue>this</font>.added = added;
+	}
+	<font color=blue>override</font> <font color=blue>int</font> opCall(<font color=blue>int</font> x)
+	{
+		<font color=blue>return</font> x + added;
+	}
+}
+<font color=blue>import</font> std.range : iota;
+<font color=blue>import</font> std.array : array;
+Function!(<font color=blue>int</font>, <font color=blue>int</font>)[] adders;
+<font color=blue>foreach_reverse</font> (i; 0..5)
+	adders ~= <font color=blue>new</font> Adder(i + 1);
+<font color=blue>assert</font> (adders.<u>arrayArray</u>()(5.iota.array) == [5, 5, 5, 5, 5]);
+</pre>
+<br><br>
+</dd>
 <dt><big><a name="Singleton"></a>template <u>Singleton</u>(Flag!"hideConstructor" hideConstructor = Yes.hideConstructor)</big></dt>
 <dd><u>Singleton</u> pattern.<br><br>
 

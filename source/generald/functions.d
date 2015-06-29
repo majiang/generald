@@ -780,6 +780,62 @@ unittest
 	RealFunction!(writeln!int).get.arraySink()(10.iota.array);
 }
 
+/// Take an array of functions and return a function from and to array.
+class ArrayArray(A, B) : Function!(A[], B[])
+{
+	Function!(A, B)[] fs;
+	this (Function!(A, B)[] fs)
+	{
+		this.fs = fs;
+	}
+	@property size_t length()
+	{
+		return fs.length;
+	}
+	override B[] opCall(A[] xs)
+	in
+	{
+		assert (length == xs.length);
+	}
+	body
+	{
+		import std.range : zip;
+		B[] ret;
+		foreach (fx; fs.zip(xs))
+			ret ~= fx[0](fx[1]);
+		return ret;
+	}
+}
+
+/// ditto
+auto arrayArray(FS)(FS fs)
+{
+	import std.range : ElementType;
+	return new ArrayArray!(ElementType!FS.InputType, ElementType!FS.OutputType)(fs);
+}
+
+///
+unittest
+{
+	static class Adder : Function!(int, int)
+	{
+		int added;
+		this (int added)
+		{
+			this.added = added;
+		}
+		override int opCall(int x)
+		{
+			return x + added;
+		}
+	}
+	import std.range : iota;
+	import std.array : array;
+	Function!(int, int)[] adders;
+	foreach_reverse (i; 0..5)
+		adders ~= new Adder(i + 1);
+	assert (adders.arrayArray()(5.iota.array) == [5, 5, 5, 5, 5]);
+}
 
 /// Singleton pattern.
 mixin template Singleton(Flag!"hideConstructor" hideConstructor = Yes.hideConstructor)
