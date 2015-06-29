@@ -751,6 +751,36 @@ alias arrayReturn(A) = arrayOnly!A;
 /// ditto
 alias ArrayReturn(A) = RealFunction!(arrayReturn!A);
 
+/// Function from Array to void can be constructed from a Function to void.
+class ArraySink(A) : Function!(A[], void)
+{
+	Function!(A, void) sink;
+	this (Function!(A, void) sink)
+	{
+		this.sink = sink;
+	}
+	override void opCall(A[] xs)
+	{
+		foreach (x; xs)
+			sink(x);
+	}
+}
+
+/// ditto
+auto arraySink(S)(S sink)
+	if (is (S : Function!(A, void), A))
+{
+	return new ArraySink!(S.InputType)(sink);
+}
+
+///
+unittest
+{
+	import std.stdio, std.range, std.array;
+	RealFunction!(writeln!int).get.arraySink()(10.iota.array);
+}
+
+
 /// Singleton pattern.
 mixin template Singleton(Flag!"hideConstructor" hideConstructor = Yes.hideConstructor)
 {

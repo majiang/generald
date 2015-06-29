@@ -340,6 +340,17 @@ z[0] = 5.tuple(2);
 <dd>Return function for Array.<br><br>
 
 </dd>
+<dt><big><a name="ArraySink"></a>class <u>ArraySink</u>(A): Function!(A[], void);
+<br><a name="arraySink"></a>auto <u>arraySink</u>(S)(S <i>sink</i>) if (is(S : Function!(A, void), A));
+</big></dt>
+<dd>Function from Array to void can be constructed from a Function to void.<br><br>
+<b>Examples:</b><br>
+<pre class="d_code">
+<font color=blue>import</font> std.stdio, std.range, std.array;
+RealFunction!(writeln!<font color=blue>int</font>).get.<u>arraySink</u>()(10.iota.array);
+</pre>
+<br><br>
+</dd>
 <dt><big><a name="Singleton"></a>template <u>Singleton</u>(Flag!"hideConstructor" hideConstructor = Yes.hideConstructor)</big></dt>
 <dd><u>Singleton</u> pattern.<br><br>
 
