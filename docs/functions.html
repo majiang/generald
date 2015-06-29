@@ -103,7 +103,13 @@ This module implements a variety of classes derived from Function.<br><br>
 </pre>
 <br><br>
 </dd>
-<dt><big><a name="MaybeReturn"></a>template <u>MaybeReturn</u>(A)</big></dt>
+<dt><big><a name="nothing"></a>Maybe!A <u>nothing</u>(A)();
+</big></dt>
+<dd>Function which always return Null.<br><br>
+
+</dd>
+<dt><big><a name="just"></a>Maybe!A <u>just</u>(A)(A <i>x</i>);
+<br><a name="maybeReturn"></a>template <u>maybeReturn</u>(A)<br><a name="MaybeReturn"></a>template <u>MaybeReturn</u>(A)</big></dt>
 <dd>Return function for Maybe.<br><br>
 
 </dd>
@@ -330,7 +336,7 @@ z[0] = 5.tuple(2);
 
 </dd>
 <dt><big><a name="arrayOnly"></a>auto <u>arrayOnly</u>(A)(A <i>x</i>);
-<br><a name="ArrayReturn"></a>template <u>ArrayReturn</u>(A)</big></dt>
+<br><a name="arrayReturn"></a>template <u>arrayReturn</u>(A)<br><a name="ArrayReturn"></a>template <u>ArrayReturn</u>(A)</big></dt>
 <dd>Return function for Array.<br><br>
 
 </dd>

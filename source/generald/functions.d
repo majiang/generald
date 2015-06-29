@@ -189,8 +189,21 @@ unittest
 	static assert (is (typeof (ug) : Function!(Tuple!(int, int), int)));
 }
 
+/// Function which always return Null.
+Maybe!A nothing(A)()
+{
+	return Maybe!A();
+}
+
 /// Return function for Maybe.
-alias MaybeReturn(A) = RealFunction!(just!A);
+Maybe!A just(A)(A x)
+{
+	return Maybe!A(x);
+}
+/// ditto
+alias maybeReturn(A) = just!A;
+/// ditto
+alias MaybeReturn(A) = RealFunction!(maybeReturn!A);
 
 /// Bind function for Maybe: (a -> Maybe b) -> (Maybe a -> Maybe b).
 class MaybeBind(A, B) : Function!(Maybe!A, Maybe!B)
@@ -288,15 +301,6 @@ class MaybeNothing(A, B, C=void) : Function!(A, Maybe!B)
 auto maybeNothing(B, F)(F f)
 {
 	return new MaybeNothing!(F.InputType, B, F.OutputType)(f);
-}
-
-Maybe!A nothing(A)()
-{
-	return Maybe!A();
-}
-Maybe!A just(A)(A x)
-{
-	return Maybe!A(x);
 }
 
 
@@ -743,7 +747,9 @@ auto arrayOnly(A)(A x)
 	return [x];
 }
 /// ditto
-alias ArrayReturn(A) = RealFunction!(arrayOnly!A);
+alias arrayReturn(A) = arrayOnly!A;
+/// ditto
+alias ArrayReturn(A) = RealFunction!(arrayReturn!A);
 
 /// Singleton pattern.
 mixin template Singleton(Flag!"hideConstructor" hideConstructor = Yes.hideConstructor)
