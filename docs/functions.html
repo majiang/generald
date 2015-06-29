@@ -14,7 +14,18 @@ This module implements a variety of classes derived from Function.<br><br>
 <dt><big><a name="RealFunction"></a>class <u>RealFunction</u>(alias f, A = ParameterTypeTuple!f[0], B = ReturnType!f): Function!(A, B);
 </big></dt>
 <dd>Template for converting a function to Function instance.<br><br>
-
+<b>Examples:</b><br>
+<pre class="d_code">
+<font color=blue>static</font> <font color=blue>int</font> f(<font color=blue>long</font> x)
+{
+	<font color=blue>return</font> <font color=blue>cast</font>(<font color=blue>int</font>)((x &gt;&gt; 32) ^ (x &amp; ((1UL &lt;&lt; 32) - 1)));
+}
+<font color=blue>static</font> <font color=blue>assert</font> (<font color=blue>is</font> (<u>RealFunction</u>!f : Function!(<font color=blue>long</font>, <font color=blue>int</font>)));
+<font color=blue>static</font> <font color=blue>assert</font> (<font color=blue>is</font> (<u>RealFunction</u>!(f, <font color=blue>int</font>, <font color=blue>int</font>) : Function!(<font color=blue>int</font>, <font color=blue>int</font>)));
+<font color=blue>static</font> <font color=blue>assert</font> (<font color=blue>is</font> (<u>RealFunction</u>!(f, <font color=blue>int</font>, <font color=blue>long</font>) : Function!(<font color=blue>int</font>, <font color=blue>long</font>)));
+<font color=blue>static</font> <font color=blue>assert</font> (<font color=blue>is</font> (<u>RealFunction</u>!(f, <font color=blue>long</font>, <font color=blue>long</font>) : Function!(<font color=blue>long</font>, <font color=blue>long</font>)));
+</pre>
+<br><br>
 </dd>
 <dt><big><a name="id"></a>T <u>id</u>(T)(T <i>x</i>);
 <br><a name="IdentityFunction"></a>template <u>IdentityFunction</u>(T)</big></dt>

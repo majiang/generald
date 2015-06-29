@@ -17,11 +17,24 @@ abstract class Function(A, B)
 class RealFunction(alias f, A=ParameterTypeTuple!f[0], B=ReturnType!f) : Function!(A, B)
 {
 	pragma(msg, "RealFunction(", A.stringof, " -> ", ParameterTypeTuple!f[0].stringof, " -> ", ReturnType!f.stringof, " -> ", B.stringof, ")");
-	override ReturnType!f opCall(ParameterTypeTuple!f[0] x)
+	override B opCall(A x)
 	{
 		return f(x);
 	}
 	mixin Singleton;
+}
+
+///
+unittest
+{
+	static int f(long x)
+	{
+		return cast(int)((x >> 32) ^ (x & ((1UL << 32) - 1)));
+	}
+	static assert (is (RealFunction!f : Function!(long, int)));
+	static assert (is (RealFunction!(f, int, int) : Function!(int, int)));
+	static assert (is (RealFunction!(f, int, long) : Function!(int, long)));
+	static assert (is (RealFunction!(f, long, long) : Function!(long, long)));
 }
 
 /// Identity function.
