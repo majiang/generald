@@ -1,2 +1,5 @@
 .dub/*
 *.exe
+*.lst
+*.in
+dub.selections.json
