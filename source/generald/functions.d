@@ -686,6 +686,7 @@ class FunctionArray(A, B) : Function!(A, B[])
 		B[] ret;
 		foreach (f; fs)
 			ret ~= f(x);
+		return ret;
 	}
 }
 
