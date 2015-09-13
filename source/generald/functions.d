@@ -368,6 +368,10 @@ private:
 	}
 }
 
+alias Left(A) = Typedef!(A, A.init, "left");
+alias Right(A) = Typedef!(A, A.init, "right");
+alias Either(A) = Either!(Left!A, Right!A);
+
 /// Tuple of functions, which takes an Either.
 class EitherFunction(A, B, C) : Function!(Either!(A, B), C)
 {
@@ -415,6 +419,29 @@ Either!(A, B) right(A, B)(B b)
 	x = b;
 	return x;
 }
+
+Either!A left(A)(A a)
+{
+	Either!A x;
+	x = Left!A(a);
+	return x;
+}
+
+Either!A right(A)(A a)
+{
+	Either!A x;
+	x = Right!A(a);
+	return x;
+}
+
+unittest
+{
+	auto a = 1.left;
+	auto b = 1.right;
+	auto c = int(1).left!string;
+	auto d = int(1).right!string;
+}
+
 
 /// Function from and to Either.
 auto eitherEither(F, G)(F f, G g)
