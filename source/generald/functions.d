@@ -342,6 +342,8 @@ struct Either(A, B)
 		else
 			return _b.to!string;
 	}
+	alias Left = A;
+	alias Right = B;
 private:
 	bool nonNull, which;
 	A _a;
